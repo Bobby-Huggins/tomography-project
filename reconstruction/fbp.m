@@ -15,10 +15,10 @@ nProj               = 360;
 assert(mod(360, nProj) == 0, 'Number of angles does not evenly divide 360 degrees.');
 angleInterval       = 360/nProj;
 I0x1                = 1;
-I0x2                = 200;
+I0x2                = 128;
 I0y1                = 1;
-I0y2                = 200;
-binning             = 4;
+I0y2                = 128;
+binning             = 16;
 sinogram            = createSinogram(filePrefix, nProj, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
                                       binning);                                 
@@ -28,8 +28,8 @@ sinogram            = createSinogram(filePrefix, nProj, angleInterval, ...
 figure
 imshow(sinogram, [])
 % Define reconstruction size
-xDim = ceil(2048/binning);
-yDim = ceil(2048/binning);
+xDim = ceil(2240/binning);
+yDim = ceil(2368/binning);
 
 % Define physical parameters of the scan
 pixelSize               = 0.050*binning;

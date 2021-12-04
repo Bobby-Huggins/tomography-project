@@ -11,8 +11,8 @@ clc
 % Images to bin:
 filePrefix = '20211129_bell_pepper';
 % Binning factor:
-binning = 4;
-corCorrection = 4;
+binning = 8;
+corCorrection = -4;
 
 % Set up the in/out paths and directories:
 basePath = pwd;
@@ -20,7 +20,7 @@ images = dir(fullfile(basePath, '/data/input/**/corrected/', ...
     strcat(filePrefix, '*.tif')));
 for ii = 1:length(images)
     image = im2double(imread(fullfile(images(ii).folder, images(ii).name)));
-    image = circshift(image, corCorrection, 
+    image = circshift(image, corCorrection, 2);
     disp(['Processing image ', num2str(ii), ' of ', num2str(length(images))]);
     binnedImage = binImage(image, binning);
     imwrite(im2uint16(binnedImage), ...
