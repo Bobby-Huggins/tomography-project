@@ -11,7 +11,7 @@ clc
 % Images to bin:
 filePrefix = '20211129_bell_pepper';
 % Binning factor:
-binning = 8;
+binning = 4;
 corCorrection = -4;
 
 % Set up the in/out paths and directories:

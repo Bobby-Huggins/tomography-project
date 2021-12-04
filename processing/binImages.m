@@ -11,8 +11,8 @@ clc
 % Images to bin:
 filePrefix = '20211129_bell_pepper';
 % Binning factor:
-binning = 8;
-corCorrection = 0;
+binning = 1;
+corCorrection = -4;
 
 % Set up the in/out paths and directories:
 basePath = pwd;
@@ -23,6 +23,7 @@ for ii = 1:length(images)
     image = circshift(image, corCorrection, 2);
     disp(['Processing image ', num2str(ii), ' of ', num2str(length(images))]);
     binnedImage = binImage(image, binning);
+    %binnedImage = image;
     imwrite(im2uint16(binnedImage), ...
         fullfile(basePath, '/data/output/binned/', num2str(binning), ...
         '/', strcat('binned_', num2str(binning), '_', images(ii).name)));

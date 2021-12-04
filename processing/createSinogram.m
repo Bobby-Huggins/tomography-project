@@ -29,11 +29,11 @@ function [sinogram] = createSinogram(filePrefix, nProj, angleInterval, ...
 % Keijo Korhonen, Ville Suokas, and Bobby Huggins
 
 
-if binning == 1
-    fullPrefix = filePrefix;
-else
-    fullPrefix = strcat('binned_', num2str(binning), '_', filePrefix);
-end
+% if binning == 1
+%     fullPrefix = filePrefix;
+% else
+     fullPrefix = strcat('binned_', num2str(binning), '_', filePrefix);
+% end
 % Look at first projection and get dimensions
 I               = im2double(imread([fullPrefix, '001.tif']));
 [rows, cols]    = size(I);
@@ -43,7 +43,7 @@ sinogram = zeros(nProj, cols);
 
 % Loop over all projections and fill in sinogram
 for iii = 1 : nProj
-    aaa = iii*angleInterval;
+    aaa = round(iii*angleInterval);
     disp(['Processing angle ' num2str(iii) '/' num2str(nProj) '.']);
     
     % Create full filename

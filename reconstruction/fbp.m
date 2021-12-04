@@ -18,7 +18,7 @@ I0x1                = 1;
 I0x2                = 128;
 I0y1                = 1;
 I0y2                = 128;
-binning             = 16;
+binning             = 8;
 sinogram            = createSinogram(filePrefix, nProj, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
                                       binning);                                 
@@ -29,7 +29,7 @@ figure
 imshow(sinogram, [])
 % Define reconstruction size
 xDim = ceil(2240/binning);
-yDim = ceil(2368/binning);
+yDim = ceil(2240/binning);
 
 % Define physical parameters of the scan
 pixelSize               = 0.050*binning;
