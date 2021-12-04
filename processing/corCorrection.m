@@ -1,4 +1,4 @@
-function [offset] = CoR_correction(sinogram)
+function [offset] = corCorrection(sinogram)
 %[offset] = CoR_correction(sinogram): Find the offset of the center of
 % rotation from a (full-resolution) sinogram.
 %   Input:  sinogram :: [n,m] double
