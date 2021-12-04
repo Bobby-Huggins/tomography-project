@@ -2,13 +2,12 @@ function [offset] = corCorrection(sinogram)
 % corCorrection: Find the offset of the center of rotation from a
 % (full-resolution) sinogram.
 %
-% INPUT:
-%   sinogram :: double(n,m)
-%       A sinogram with columns corresponding to evenly spaced imaging
-%       angles accross a full 360 degrees.
+% INPUT:  sinogram :: [n,m] double
+%           A sinogram with columns corresponding to evenly spaced imaging
+%           angles accross a full 360 degrees.
 % OUTPUT:
 %   offset :: int
-%       An integer representing the shift to be applied. 
+%   An integer representing the shift to be applied. 
 
     [rows, cols] = size(sinogram);
    
