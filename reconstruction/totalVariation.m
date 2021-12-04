@@ -1,37 +1,27 @@
-%tvreg_demo1  Demo script for a TV tomography problem
+function [recon] = totalVariation(...
+                        numProjections, binning, dataset, alpha, maxK)
+%% totalVariation - Compute an approximation of the minimum total variation solution.
 %
-% This script illustrates the use of the TV algorithm
-% implemented in the functions tvreg_upn and tvreg_gpbb.
-% The user can easily modify the script for
-% other noise levels, regularization etc..
+% INPUTS:
+% numProjections :: int
+%   The number of evenly spaced projections in the measurement data. Must
+%   divide 360.
+% binning :: int
+%   The binning factor.
+% dataset :: string
+%   The comparison dataset: either 'low dose' or 'high dose'.
+% alpha :: double
+%   The regularization parameter.
+% maxK :: int
+%   The maximum number of iterations in the optimization procedure.
 %
-% The scripts loads a a clean threedimensional version of the 
-% classical Shepp-Logan phantom image, and  
-% obtains the observed data by multiplication with 
-% a tomography matrix A and addition of noise.
-% The algorithms tvreg_upn and tvreg_gpbb are used to 
-% obtain the TV reconstructions of the phantom. An reference
-% solution is calculated to obtain an estimate of the optimal
-% objective.
+% OUTPUTS:
+% recon :: Reconstruction (see class file in /utility).
+%   A class containing the reconstructed image and associated data.
 
-clear
-close all
-clc
-%% Set parameters
-binning = 8;
 xDim = ceil(2240/binning);
 yDim = ceil(2240/binning);
-numProjections = 180; % Number of projections to reconstruct from
-
-alpha  = 0.1;        % Regularization parameter
-% r1_max = xDim/2;         % Halfwidth of object cube
-% N      = 2*r1_max; % Full width of object cube
-% N3     = N^2;        % Total number of variables
-dims   = [xDim,yDim];    % Dimensions
-% u_max  = r1_max;         % Halfwidth of projection planes
-% U      = 2*u_max;  % Full width of projection planes
-
-filePrefix   = '20211129_bell_pepper_low_dose_';
+dims   = [xDim,yDim];
 assert(mod(360, numProjections) == 0, 'Number of angles does not evenly divide 360 degrees.');
 angleInterval       = 360/numProjections;
 I0x1                = 1;
@@ -39,13 +29,19 @@ I0x2                = ceil(256/binning);
 I0y1                = 1;
 I0y2                = ceil(256/binning);
 angles              = (angleInterval : angleInterval : 360);
+switch dataset
+    case 'low dose'
+        filePrefix = '20211129_bell_pepper_low_dose_';
+    case 'high dose'
+        filePrefix = '20211129_bell_pepper_';
+    otherwise
+        error("Supported datasets are 'low dose' or 'high dose'.");
+end
+    
 sinogram            = createSinogram(filePrefix, numProjections, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
-                                      binning); 
-%% Construct tomography system matrix A and make spy plot
-
-% Define reconstruction size
-
+                                      binning);
+%% Construct tomography system matrix A
 
 % Define physical parameters of the scan
 pixelSize               = 0.050*binning;
@@ -55,19 +51,12 @@ distanceOriginDetector  = distanceSourceDetector - distanceSourceOrigin;
 geometricMagnification  = distanceSourceDetector / distanceSourceOrigin;
 effectivePixelSize      = pixelSize / geometricMagnification;
 
-% Subsample sinogram
-% angleInterval   = 5;
-% anglesSparse    = 0 : angleInterval : (360 - angleInterval);
-% ind             = ismembertol(angles, anglesSparse);
-% sinogramSparse  = sinogram(ind, :);
-
 % Create shorthands for needed variables
 DSO                 = distanceSourceOrigin;
 DOD                 = distanceOriginDetector;
 M                   = geometricMagnification;
 [~, numDetectors]   = size(sinogram);
 effPixel            = effectivePixelSize;
-
 
 % Rather technical ASTRA Tomography Toolbox code to compute FBP fan beam
 % reconstruction
@@ -115,6 +104,7 @@ astra_mex_matrix('delete', projectionMatrix);
 % The TV Toolbox Expects the Transpose (may lead to a rotation compared to
 % other reconstructions):
 sinogram = sinogram';
+
 %% Parameters for the reconstruction algorithms
 tau         = 1e-4*norm(sinogram(:),'inf');       % Huber smoothing parameter
 
@@ -125,13 +115,14 @@ constraint.d    = 1*ones(prod(dims),1);
 
 % Options
 opt.epsb_rel = 1e-6;
-opt.k_max    = 400;
+opt.k_max    = maxK;
 opt.qs       = 1;
 opt.K        = 2;
 opt.verbose  = 1;
 opt.beta     = 0.95;
 
 b = sinogram(:);
+
 % % Options for reference solution
 % opt_ref.epsb_rel = 1e-8;
 % opt_ref.k_max    = 2000;
@@ -163,33 +154,20 @@ tupn = toc
 %     tvreg_upn(A,b,alpha,tau,dims,constraint,opt);
 % tupnz = toc
 
-%% Plot convergence rates in terms of objective function values of the 
-%% three methods, comparing to the final reference objective function value
-figure
-%stairs(abs((fxkl_UPN-fs)/fs),'r')
-stairs(abs(fxkl_UPN),'r')
-% hold on
-% stairs(abs((fxkl_UPNz-fs)/fs),'b')
-% stairs(abs((fxkl_GPBB-fs)/fs),'g')
-%stairs(abs(fxkl_GPBB),'g')
-set(gca,'yscale','log')
-% legend('UPN','UPN_0','GPBB')
-xlabel('k')
-ylabel('(f(x^k)-f^*)/f^*')
-title('Convergence')
-
-%% Display reconstructions
-recon = Reconstruction('TV', alpha, 1000, 'UPN', reshape(xk_UPN, dims));
-figure
-%plotLayers(reshape(xk_GPBB,dims))
-imshow(reshape(sqrt(xk_UPN), dims), []);
-%recon.show
-%suptitle('GPBB reconstruction')
-
+% %% Plot convergence rates in terms of objective function values of the 
+% %% three methods, comparing to the final reference objective function value
 % figure
-% plotLayers(reshape(xk_UPN,dims))
-% %suptitle('UPN reconstruction')
-% 
-% figure
-% plotLayers(reshape(xk_UPNz,dims))
-% %suptitle('UPN_0 reconstruction')
+% %stairs(abs((fxkl_UPN-fs)/fs),'r')
+% stairs(abs(fxkl_UPN),'r')
+% % hold on
+% % stairs(abs((fxkl_UPNz-fs)/fs),'b')
+% % stairs(abs((fxkl_GPBB-fs)/fs),'g')
+% %stairs(abs(fxkl_GPBB),'g')
+% set(gca,'yscale','log')
+% % legend('UPN','UPN_0','GPBB')
+% xlabel('k')
+% ylabel('(f(x^k)-f^*)/f^*')
+% title('Convergence')
+
+%% Return reconstruction
+recon = Reconstruction('TV', alpha, maxK, reshape(xk_UPN, dims));

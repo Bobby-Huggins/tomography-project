@@ -18,21 +18,20 @@ clear
 close all
 clc
 %% Set parameters
-binning = 16;
+binning = 8;
 xDim = ceil(2240/binning);
 yDim = ceil(2240/binning);
+numProjections = 180; % Number of projections to reconstruct from
 
 alpha  = 0.1;        % Regularization parameter
 % r1_max = xDim/2;         % Halfwidth of object cube
 % N      = 2*r1_max; % Full width of object cube
 % N3     = N^2;        % Total number of variables
-% dims   = [N,N,1];    % Dimensions
+dims   = [xDim,yDim];    % Dimensions
 % u_max  = r1_max;         % Halfwidth of projection planes
 % U      = 2*u_max;  % Full width of projection planes
-% numProjections = 180; % Number of projections to reconstruct from
-% binning        = 8;
 
-filePrefix   = '20211129_bell_pepper_';
+filePrefix   = '20211129_bell_pepper_low_dose_';
 assert(mod(360, numProjections) == 0, 'Number of angles does not evenly divide 360 degrees.');
 angleInterval       = 360/numProjections;
 I0x1                = 1;
@@ -113,33 +112,8 @@ astra_mex_data2d('delete', projectionGeometry);
 astra_mex_projector('delete', projectorObject);
 astra_mex_matrix('delete', projectionMatrix);
 
-% figure
-% spy(A)
-% title('Sparsity pattern in A')
-
-% %% Construct true image and right hand side
-% X0     = phantom('Modified Shepp-Logan',N);         % 2d version
-% x0     = X0(:);                                     % Vectorized version
-% borig  = A*x0;                                      % Projections from true
-% Borig  = reshape(borig,[],numProjections);         % Projections in layers
-% 
-% %% Add noise
-% e = getNoise(rnl,borig);                % Gaussian white noise
-% b = borig+e;                            % Additive
-% B = reshape(b,[],numProjections);      % Noisy projections in layers
-% 
-% %% Display layers of true image along with noisefree and noisy projeections
-% figure
-% plotLayers(X0)
-% %suptitle('True image')
-% 
-% figure
-% plotLayers(Borig)
-% %suptitle('Noisefree projections')
-% 
-% figure
-% plotLayers(B)
-% %suptitle('Noisy projections')
+% The TV Toolbox Expects the Transpose (may lead to a rotation compared to
+% other reconstructions):
 sinogram = sinogram';
 %% Parameters for the reconstruction algorithms
 tau         = 1e-4*norm(sinogram(:),'inf');       % Huber smoothing parameter
