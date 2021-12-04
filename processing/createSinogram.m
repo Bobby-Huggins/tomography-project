@@ -20,7 +20,7 @@ function [sinogram] = createSinogram(filePrefix, nProj, ...
 % Keijo Korhonen, Ville Suokas, and Bobby Huggins
 
 % Look at first projection and get dimensions
-I               = double(imread([filePrefix '0001.tif']));
+I               = double(imread([filePrefix '001.tif']));
 [rows, cols]    = size(I);
 
 % Initialize empty sinogram
@@ -31,7 +31,7 @@ for iii = 1 : nProj
     disp(['Processing angle ' num2str(iii) '/' num2str(nProj) '.']);
     
     % Create full filename
-    filename = [filePrefix sprintf('%.04d', iii) '.tif'];
+    filename = [filePrefix sprintf('%.03d', iii) '.tif'];
     
     % Read in image
     I           = double(imread(filename));
