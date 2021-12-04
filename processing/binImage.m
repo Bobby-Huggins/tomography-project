@@ -23,8 +23,8 @@ if mod(cols, binning) ~= 0
         ') is not divisible by binning factor (', num2str(binning), ...
         '). Edge bins will be undersized.']);
 end
-newRows = idivide(rows, binning, 'ceil');
-newCols = idivide(cols, binning, 'ceil');
+newRows = ceil(rows/binning);
+newCols = ceil(cols/binning);
 binnedImage = zeros(newRows, newCols);
 
 for r = 1:newRows
@@ -45,7 +45,7 @@ for r = 1:newRows
             binRight = c*binning + 1;
         end
         % Average the image over the specified bin:
-        value = mean(image(binTop:binBottom, binLeft:binRight);
+        value = mean(image(binTop:binBottom, binLeft:binRight), 'all');
         binnedImage(r, c) = value;
     end
 end

@@ -1,0 +1,15 @@
+function binImages(filePrefix, binning)
+% Apply the binImage function to the given images, and save the results in
+% /data/output
+
+% Set up the in/out paths and directories:
+basePath = pwd;
+images = dir(fullfile(basePath, '/data/input/**/corrected/', filePrefix, '*.tif'));
+for ii = 1:length(images)
+    baseFileName = images(k).name;
+    image = imread(fullfile(basePath, ii);
+    disp('Processing image ', num2str(ii), ' of ', num2str(length(images)));
+    binnedImage = binImage(image);
+    imwrite(fullfile(basePath, '/data/output/binned/', num2str(binning), ...
+        '/', filePrefix, num2str(ii), '_binned_', num2str(binning), '.tif'));
+end
