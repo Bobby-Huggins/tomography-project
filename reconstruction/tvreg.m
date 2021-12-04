@@ -17,32 +17,28 @@
 clear
 close all
 clc
-
-%addpath lebdir tomobox
-
-% Ensure we can reproduce results by fixing random numbers
-randn('state',600)
-rand('state',700)
-
 %% Set parameters
-rnl    = 0.01;       % Noise level
-alpha  = 0.05;        % Regularization parameter
-r1_max = 140;         % Halfwidth of object cube
-N      = 2*r1_max; % Full width of object cube
-N3     = N^2;        % Total number of variables
-dims   = [N,N,1];    % Dimensions
-u_max  = 140;         % Halfwidth of projection planes
-U      = 2*u_max;  % Full width of projection planes
-numProjections = 360; % Number of projections to reconstruct from
-binning        = 8;
+binning = 16;
+xDim = ceil(2240/binning);
+yDim = ceil(2240/binning);
 
-filePrefix   = '20211129_bell_pepper_low_dose_';
+alpha  = 0.1;        % Regularization parameter
+% r1_max = xDim/2;         % Halfwidth of object cube
+% N      = 2*r1_max; % Full width of object cube
+% N3     = N^2;        % Total number of variables
+% dims   = [N,N,1];    % Dimensions
+% u_max  = r1_max;         % Halfwidth of projection planes
+% U      = 2*u_max;  % Full width of projection planes
+% numProjections = 180; % Number of projections to reconstruct from
+% binning        = 8;
+
+filePrefix   = '20211129_bell_pepper_';
 assert(mod(360, numProjections) == 0, 'Number of angles does not evenly divide 360 degrees.');
 angleInterval       = 360/numProjections;
 I0x1                = 1;
-I0x2                = 128/binning;
+I0x2                = ceil(256/binning);
 I0y1                = 1;
-I0y2                = 128/binning;
+I0y2                = ceil(256/binning);
 angles              = (angleInterval : angleInterval : 360);
 sinogram            = createSinogram(filePrefix, numProjections, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
@@ -50,8 +46,7 @@ sinogram            = createSinogram(filePrefix, numProjections, angleInterval, 
 %% Construct tomography system matrix A and make spy plot
 
 % Define reconstruction size
-xDim = ceil(2240/binning);
-yDim = ceil(2240/binning);
+
 
 % Define physical parameters of the scan
 pixelSize               = 0.050*binning;
@@ -108,6 +103,7 @@ projectionMatrix = astra_mex_projector('matrix', projectorObject);
 
 % Obtain projection matrix as a MATLAB sparse matrix
 A = astra_mex_matrix('get', projectionMatrix);
+%A = opTomo('strip_fanflat', projectionGeometry, volumeGeometry);
 
 fprintf('done.\n');
 
@@ -155,7 +151,7 @@ constraint.d    = 1*ones(prod(dims),1);
 
 % Options
 opt.epsb_rel = 1e-6;
-opt.k_max    = 1000;
+opt.k_max    = 400;
 opt.qs       = 1;
 opt.K        = 2;
 opt.verbose  = 1;
@@ -175,16 +171,16 @@ b = sinogram(:);
 % fs = fxkl_ref(end);     % Final reference objective function value
 
 % Solve using GPBB
-tic
-[xk_GPBB fxk_GPBB hxk_GPBB gx_kGPBB fxkl_GPBB info_GPBB] = ...
-    tvreg_gpbb(A,b,alpha,tau,dims,constraint,opt);
-tGPBB = toc
+% tic
+% [xk_GPBB fxk_GPBB hxk_GPBB gx_kGPBB fxkl_GPBB info_GPBB] = ...
+%     tvreg_gpbb(A,b,alpha,tau,dims,constraint,opt);
+% tGPBB = toc
 
 % % Solve using UPN
-% tic
-% [xk_UPN fxk_UPN hxk_UPN gxk_UPN fxkl_UPN info_UPN] = ...
-%     tvreg_upn(A,b,alpha,tau,dims,constraint,opt);
-% tupn = toc
+tic
+[xk_UPN fxk_UPN hxk_UPN gxk_UPN fxkl_UPN info_UPN] = ...
+    tvreg_upn(A,b,alpha,tau,dims,constraint,opt);
+tupn = toc
 % 
 % % Solve using UPN0
 % tic
@@ -196,11 +192,12 @@ tGPBB = toc
 %% Plot convergence rates in terms of objective function values of the 
 %% three methods, comparing to the final reference objective function value
 figure
-% stairs(abs((fxkl_UPN-fs)/fs),'r')
+%stairs(abs((fxkl_UPN-fs)/fs),'r')
+stairs(abs(fxkl_UPN),'r')
 % hold on
 % stairs(abs((fxkl_UPNz-fs)/fs),'b')
 % stairs(abs((fxkl_GPBB-fs)/fs),'g')
-stairs(abs(fxkl_GPBB),'g')
+%stairs(abs(fxkl_GPBB),'g')
 set(gca,'yscale','log')
 % legend('UPN','UPN_0','GPBB')
 xlabel('k')
@@ -208,9 +205,11 @@ ylabel('(f(x^k)-f^*)/f^*')
 title('Convergence')
 
 %% Display reconstructions
+recon = Reconstruction('TV', alpha, 1000, 'UPN', reshape(xk_UPN, dims));
 figure
 %plotLayers(reshape(xk_GPBB,dims))
-imshow(reshape(sqrt(xk_GPBB), dims), []);
+imshow(reshape(sqrt(xk_UPN), dims), []);
+%recon.show
 %suptitle('GPBB reconstruction')
 
 % figure
