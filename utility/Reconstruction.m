@@ -31,24 +31,12 @@ classdef Reconstruction
         function s = get.Size(recon)
             s = size(recon.Image);
         end
-        function show(recon, contrast)
-            if nargin == 1
-                figure();
-                imshow(recon.Image, []);
-            else
-                switch contrast
-                    case 'default'
-                        figure();
-                        imshow(recon.Image, []);
-                    case 'high contrast'
-                        figure();
-                        imshow(sqrt(recon.Image), []);
-                    otherwise
-                        warning('Using default.contrast');
-                        figure();
-                        imshow(recon.Image, []);
-                end
+        function show(recon, options)
+            arguments
+                recon (1,1) Reconstruction
+                options.Contrast (1,1) {mustBeNumeric} = 1
             end
+            imshow((recon.Image).^(1/options.Contrast), []);
         end
     end
 end

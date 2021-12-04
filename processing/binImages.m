@@ -1,17 +1,14 @@
+function binImages(binningFactor)
+
 % Apply the binImage function to the given images, and save the results in
-% /data/output
+% /data/output/binned/$binningFactor/
 
 % Must be run with Current Folder at root of project directory. New folders
-% may need to be added manually for different binning factors.
-
-close all
-clear all
-clc
+% may need to be created manually for different binning factors.
 
 % Images to bin:
 filePrefix = '20211129_bell_pepper';
-% Binning factor:
-binning = 1;
+% Center of rotation correction:
 corCorrection = -4;
 
 % Set up the in/out paths and directories:
