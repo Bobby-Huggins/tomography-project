@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<comment version="3.0">
+  <caption/>
+  <note>[Acquisition],areSource=&quot;0,0,2240,2368&quot;,BytesPerPixel=2,AcqMode=2,pntOrigCh=&quot;0,0&quot;,pntOrigFB=&quot;0,0&quot;,areGRBScan=&quot;0,0,2240,2368&quot;,DataType=7,DataTypeOfSingleImage=7,NrExposure=1,NrTrigger=0,BacksubCorr=-1,ShadingCorr=-1[DisplayLUT],EntrySize=7,LowerValue=0,UpperValue=131072,Lut16xShift=1[Scaling],ScalingXType=1,ScalingYType=1,ScalingXScale=1,ScalingYScale=1,ScalingXUnit=No unit,ScalingYUnit=No unit[Application],SoftwareVersion=&quot;9.3 pf6&quot;</note>
+  <place/>
+  <categories/>
+</comment>
