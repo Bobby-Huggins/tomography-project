@@ -1,5 +1,6 @@
 function [sinogram] = createSinogram(filePrefix, nProj, ...
-                                      I0x1, I0x2, I0y1, I0y2)
+                                      I0x1, I0x2, I0y1, I0y2, ...
+                                      binning, corCorrection)
 % createSinogram - Create sinogram from cone beam measurements.
 %
 % INPUT:
@@ -10,6 +11,12 @@ function [sinogram] = createSinogram(filePrefix, nProj, ...
 %   I0x1,...,I0y2 :: int(s)
 %       X and Y coordinates defining the calibration
 %       window.
+%   binning :: int
+%       A scaling factor such that #ofBins = #ofPixels/binning.
+%   corCorrection :: int
+%       The number of pixels to shift each original image to correct for
+%       the offset center of rotation.
+%
 % OUTPUT:
 %   sinogram :: double(nProj, cols)
 %       Sinogram of data, where cols is X-ray image width.
@@ -19,9 +26,12 @@ function [sinogram] = createSinogram(filePrefix, nProj, ...
 % Adapted by:
 % Keijo Korhonen, Ville Suokas, and Bobby Huggins
 
+
 % Look at first projection and get dimensions
 I               = double(imread([filePrefix '001.tif']));
 [rows, cols]    = size(I);
+rows            = rows / binning;
+cols            = cols / binning;
 
 % Initialize empty sinogram
 sinogram = zeros(nProj, cols);
@@ -35,8 +45,11 @@ for iii = 1 : nProj
     
     % Read in image
     I           = double(imread(filename));
-    I0region    = I(I0y1:I0y2, I0x1:I0x2);
+    I           = circshift(I, corCorrection, 2);
+    I           = binImage(I, binning);
+    I0region    = I(I0y1:(I0y2/binning), I0x1:(I0x2/binning));
     I0          = mean(I0region(:));
+    %Ilog        = -log(I/I0);
     
     % Pick out center row and insert it into the sinogram
     projectionData      = I(rows/2, :);
@@ -45,4 +58,3 @@ for iii = 1 : nProj
 end
 
 end
-
