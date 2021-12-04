@@ -16,10 +16,10 @@ I0x1                = 1;
 I0x2                = 200;
 I0y1                = 1;
 I0y2                = 200;
-%sinogram            = createSinogram(filenameFirstPart, nProj, ...
-%                                      I0x1, I0x2, I0y1, I0y2);                                 
-%save('20201111_bell_pepper_sinogram_full_low_dose', 'sinogram');
-load('20211204_bell_pepper_sinogram_full');
+sinogram            = createSinogram(filenameFirstPart, nProj, ...
+                                      I0x1, I0x2, I0y1, I0y2);                                 
+save('20201111_bell_pepper_sinogram_full_low_dose', 'sinogram');
+%load('20211204_bell_pepper_sinogram_full');
 
 % Define reconstruction size
 xDim = 2048;
