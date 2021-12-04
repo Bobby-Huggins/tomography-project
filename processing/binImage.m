@@ -37,15 +37,15 @@ for r = 1:newRows
         binBottom = r*binning;
     end
     
-    for c = 1:newCols-1
+    for c = 1:newCols
         binLeft = (c-1)*binning + 1;
         if c == newCols
             binRight = cols;
         else
-            binRight = c*binning + 1;
+            binRight = c*binning;
         end
         % Average the image over the specified bin:
-        value = mean(image(binTop:binBottom, binLeft:binRight), 'all');
+        value = sum(image(binTop:binBottom, binLeft:binRight), 'all');
         binnedImage(r, c) = value;
     end
 end

@@ -12,29 +12,33 @@ clc;
 % Create sinogram
 filePrefix   = '20211129_bell_pepper_';
 nProj               = 360;
+assert(mod(360, nProj) == 0, 'Number of angles does not evenly divide 360 degrees.');
+angleInterval       = 360/nProj;
 I0x1                = 1;
 I0x2                = 200;
 I0y1                = 1;
 I0y2                = 200;
-sinogram            = createSinogram(filePrefix, nProj, ...
+binning             = 4;
+sinogram            = createSinogram(filePrefix, nProj, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
-                                      4, 4);                                 
-save('20201111_bell_pepper_sinogram_full', 'sinogram');
+                                      binning);                                 
+%save('20201111_bell_pepper_sinogram_full_low_dose_binned_4', 'sinogram');
 %load('20211204_bell_pepper_sinogram_full');
-
+%load('20201111_bell_pepper_sinogram_full_low_dose_binned_4');
+figure
+imshow(sinogram, [])
 % Define reconstruction size
-xDim = 2048;
-yDim = 2048;
+xDim = ceil(2048/binning);
+yDim = ceil(2048/binning);
 
 % Define physical parameters of the scan
-pixelSize               = 0.050;
+pixelSize               = 0.050*binning;
 distanceSourceDetector  = 553.74;
 distanceSourceOrigin    = 110.66 + 100;
 distanceOriginDetector  = distanceSourceDetector - distanceSourceOrigin;
 geometricMagnification  = distanceSourceDetector / distanceSourceOrigin;
 effectivePixelSize      = pixelSize / geometricMagnification;
-angleInterval           = 1.0;
-angles                  = (0 : angleInterval : (360-angleInterval));
+angles                  = (angleInterval : angleInterval : 360);
 
 % Create shorthands for needed variables
 DSO                 = distanceSourceOrigin;

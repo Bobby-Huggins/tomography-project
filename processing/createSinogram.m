@@ -1,6 +1,6 @@
-function [sinogram] = createSinogram(filePrefix, nProj, ...
+function [sinogram] = createSinogram(filePrefix, nProj, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
-                                      binning, corCorrection)
+                                      binning)
 % createSinogram - Create sinogram from cone beam measurements.
 %
 % INPUT:
@@ -8,6 +8,8 @@ function [sinogram] = createSinogram(filePrefix, nProj, ...
 %       Path and prefix of X-ray images.
 %   nProj :: int
 %       Number of projection angles.
+%   angleInterval :: int
+%       Separation (in degrees) between each projection.
 %   I0x1,...,I0y2 :: int(s)
 %       X and Y coordinates defining the calibration
 %       window.
@@ -26,9 +28,14 @@ function [sinogram] = createSinogram(filePrefix, nProj, ...
 % Adapted by:
 % Keijo Korhonen, Ville Suokas, and Bobby Huggins
 
-fullPrefix = strcat('binned_', num2str(binning), '_', filePrefix);
+
+if binning == 1
+    fullPrefix = filePrefix;
+else
+    fullPrefix = strcat('binned_', num2str(binning), '_', filePrefix);
+end
 % Look at first projection and get dimensions
-I               = double(imread([fullPrefix, '001.tif']));
+I               = im2double(imread([fullPrefix, '001.tif']));
 [rows, cols]    = size(I);
 
 % Initialize empty sinogram
@@ -36,14 +43,14 @@ sinogram = zeros(nProj, cols);
 
 % Loop over all projections and fill in sinogram
 for iii = 1 : nProj
+    aaa = iii*angleInterval;
     disp(['Processing angle ' num2str(iii) '/' num2str(nProj) '.']);
     
     % Create full filename
-    filename = [fullPrefix sprintf('%.03d', iii) '.tif'];
+    filename = [fullPrefix sprintf('%.03d', aaa) '.tif'];
     
     % Read in image
-    I           = double(imread(filename));
-    I           = circshift(I, corCorrection, 2);
+    I           = im2double(imread(filename));
     I0region    = I(I0y1:(I0y2/binning), I0x1:(I0x2/binning));
     I0          = mean(I0region(:));
     
