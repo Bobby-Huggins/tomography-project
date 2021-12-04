@@ -26,12 +26,10 @@ function [sinogram] = createSinogram(filePrefix, nProj, ...
 % Adapted by:
 % Keijo Korhonen, Ville Suokas, and Bobby Huggins
 
-
+fullPrefix = strcat('binned_', num2str(binning), '_', filePrefix);
 % Look at first projection and get dimensions
-I               = double(imread([filePrefix '001.tif']));
+I               = double(imread([fullPrefix, '001.tif']));
 [rows, cols]    = size(I);
-rows            = rows / binning;
-cols            = cols / binning;
 
 % Initialize empty sinogram
 sinogram = zeros(nProj, cols);
@@ -41,15 +39,13 @@ for iii = 1 : nProj
     disp(['Processing angle ' num2str(iii) '/' num2str(nProj) '.']);
     
     % Create full filename
-    filename = [filePrefix sprintf('%.03d', iii) '.tif'];
+    filename = [fullPrefix sprintf('%.03d', iii) '.tif'];
     
     % Read in image
     I           = double(imread(filename));
     I           = circshift(I, corCorrection, 2);
-    I           = binImage(I, binning);
     I0region    = I(I0y1:(I0y2/binning), I0x1:(I0x2/binning));
     I0          = mean(I0region(:));
-    %Ilog        = -log(I/I0);
     
     % Pick out center row and insert it into the sinogram
     projectionData      = I(rows/2, :);

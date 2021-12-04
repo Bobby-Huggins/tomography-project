@@ -10,15 +10,16 @@ clear;
 clc;
 
 % Create sinogram
-filenameFirstPart   = '20211129_bell_pepper_low_dose_';
+filePrefix   = '20211129_bell_pepper_';
 nProj               = 360;
 I0x1                = 1;
 I0x2                = 200;
 I0y1                = 1;
 I0y2                = 200;
-sinogram            = createSinogram(filenameFirstPart, nProj, ...
-                                      I0x1, I0x2, I0y1, I0y2);                                 
-save('20201111_bell_pepper_sinogram_full_low_dose', 'sinogram');
+sinogram            = createSinogram(filePrefix, nProj, ...
+                                      I0x1, I0x2, I0y1, I0y2, ...
+                                      4, 4);                                 
+save('20201111_bell_pepper_sinogram_full', 'sinogram');
 %load('20211204_bell_pepper_sinogram_full');
 
 % Define reconstruction size

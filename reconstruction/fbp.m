@@ -10,13 +10,13 @@ clear;
 clc;
 
 % Create sinogram
-filenameFirstPart   = '20211129_bell_pepper_';
+filePrefix   = '20211129_bell_pepper_';
 nProj               = 360;
 I0x1                = 1;
 I0x2                = 200;
 I0y1                = 1;
 I0y2                = 200;
-sinogram            = createSinogram(filenameFirstPart, nProj, ...
+sinogram            = createSinogram(filePrefix, nProj, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
                                       4, 4);                                 
 save('20201111_bell_pepper_sinogram_full', 'sinogram');
