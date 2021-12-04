@@ -1,4 +1,4 @@
-function binImages(binningFactor)
+function binImages(binning)
 
 % Apply the binImage function to the given images, and save the results in
 % /data/output/binned/$binningFactor/
@@ -19,8 +19,11 @@ for ii = 1:length(images)
     image = im2double(imread(fullfile(images(ii).folder, images(ii).name)));
     image = circshift(image, corCorrection, 2);
     disp(['Processing image ', num2str(ii), ' of ', num2str(length(images))]);
-    binnedImage = binImage(image, binning);
-    %binnedImage = image;
+    if binning ~= 1
+        binnedImage = binImage(image, binning);
+    else
+        binnedImage = image;
+    end
     imwrite(im2uint16(binnedImage), ...
         fullfile(basePath, '/data/output/binned/', num2str(binning), ...
         '/', strcat('binned_', num2str(binning), '_', images(ii).name)));
