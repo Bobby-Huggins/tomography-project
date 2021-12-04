@@ -8,7 +8,7 @@ clc
 binning = 8;
 %%
 % (Subdirectories for each binning factor may need to be created manually.)
-binImages(binning);
+% binImages(binning);
 %% Create a TV reconstruction from the binned images, for the sparse case:
 % Create sparse reconstruction with 18 angles and a binning factor of 8.
 % Regularization paramater alpha=0.05, and max iterations=400.
