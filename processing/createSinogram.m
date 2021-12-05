@@ -1,6 +1,6 @@
 function [sinogram] = createSinogram(filePrefix, nProj, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
-                                      binning)
+                                      subsampling, factor)
 % createSinogram - Create sinogram from cone beam measurements.
 %
 % INPUT:
@@ -13,8 +13,10 @@ function [sinogram] = createSinogram(filePrefix, nProj, angleInterval, ...
 %   I0x1,...,I0y2 :: int(s)
 %       X and Y coordinates defining the calibration
 %       window.
-%   binning :: int
-%       A scaling factor such that #ofBins = #ofPixels/binning.
+%   subsampling :: string
+%       Either 'subsampling' or 'binning'.
+%   factor :: int
+%       A scaling factor for the subsampling/binning.
 %   corCorrection :: int
 %       The number of pixels to shift each original image to correct for
 %       the offset center of rotation.
@@ -28,12 +30,15 @@ function [sinogram] = createSinogram(filePrefix, nProj, angleInterval, ...
 % Adapted by:
 % Keijo Korhonen, Ville Suokas, and Bobby Huggins
 
+switch subsampling
+    case 'subsampling'
+        fullPrefix = strcat('subsampled_', num2str(factor), '_', filePrefix);
+    case 'binning'
+        fullPrefix = strcat('binned_', num2str(factor), '_', filePrefix);
+    otherwise
+        error("Subsampling argument must take value 'subsampling' or 'binning'.");
+end
 
-% if binning == 1
-%     fullPrefix = filePrefix;
-% else
-     fullPrefix = strcat('binned_', num2str(binning), '_', filePrefix);
-% end
 % Look at first projection and get dimensions
 I               = im2double(imread([fullPrefix, '001.tif']));
 [rows, cols]    = size(I);
@@ -51,7 +56,7 @@ for iii = 1 : nProj
     
     % Read in image
     I           = im2double(imread(filename));
-    I0region    = I(I0y1:(I0y2/binning), I0x1:(I0x2/binning));
+    I0region    = I(I0y1:(I0y2/factor), I0x1:(I0x2/factor));
     I0          = mean(I0region(:));
     
     % Pick out center row and insert it into the sinogram
