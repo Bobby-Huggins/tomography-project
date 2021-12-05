@@ -1,5 +1,5 @@
 function recon = filteredBP(...
-    numProjections, subsampling, factor, dataset)
+    numProjections, subsampling, factor, dataset, registration)
 % FBP Reconstruction
 %
 % Inverse Problems Project Work course 2021
@@ -99,7 +99,7 @@ astra_mex_algorithm('run', reconstructionAlgorithm);
 fprintf('done.\n');
 
 % Get reconstruction as a matrix
-fbp = astra_mex_data2d('get', reconstructionObject);
+recon = astra_mex_data2d('get', reconstructionObject);
 
 % Memory cleanup
 astra_mex_data2d('delete', volumeGeometry);
@@ -110,5 +110,27 @@ astra_mex_algorithm('delete', reconstructionAlgorithm);
 astra_clear;
 %clearvars -except recon
 
+%% Rotate the reconstruction to address registration issue:
+% In case we are using the low-dose dataset, we have to fix a small
+% misalignment. We may skip this part altogether by setting the optional registration
+% variable to noRegistration.
+if ~exist('registration', 'var') || (isequal(registration, 'registration'))
+    switch dataset
+        case 'low dose'
+            if exist(['registrationTransform_' num2str(factor), '.mat'], 'file') == 2
+                % Load the transform computed in /utility/registration.m
+                transform = load(['registrationTransform_' num2str(factor)]);
+                transform = transform.transform;
+                % And apply the transformation to the reconstruction:
+                recon = imwarp(recon, transform, 'OutputView', imref2d(size(recon)));
+            else
+                warning("Cannot find transform to correct dataset misalignment. See /utility/registration.m");
+            end
+    end
+elseif exist('registration', 'var') && (isequal(registration, 'noRegistration'))
+else
+    error("Registration option should equal 'registration' or 'noRegistration'.");
+end
 %% Return a Reconstruction object:
-recon = Reconstruction('FBP', 0.0, 0, fbp);
+% Renormalize the image by its mean:
+recon = Reconstruction('FBP', 0.0, 0, im2double(recon), 0, 0);
