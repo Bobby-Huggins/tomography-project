@@ -1,6 +1,6 @@
 function [recon] = totalVariation(...
                         numProjections, subsampling, factor, dataset, ...
-                        alpha, maxK)
+                        alpha, maxK, registration)
 %% totalVariation - Compute an approximation of the minimum total variation solution.
 %
 % INPUTS:
@@ -173,6 +173,28 @@ tupn = toc
 % ylabel('(f(x^k)-f^*)/f^*')
 % title('Convergence')
 
+%% Rotate the reconstruction to address registration issue:
+% First transpose to get image close to FBP result:
+recon = reshape(xk_UPN, dims)';
+% In case we are using the low-dose dataset, we have to fix a small
+% misalignment:
+if ~exist('registration', 'var') || (isequal(registration, 'registration'))
+    switch dataset
+        case 'low dose'
+            if exist(['registrationTransform_' num2str(factor), '.mat'], 'file') == 2
+                % Load the transform computed in /utility/registration.m
+                transform = load(['registrationTransform_' num2str(factor)]);
+                transform = transform.transform;
+                % And apply the transformation to the reconstruction:
+                recon = imwarp(recon, transform, 'OutputView', imref2d(size(recon)));
+            else
+                warning("Cannot find transform to correct dataset misalignment. See /utility/registration.m");
+            end
+    end
+elseif exist('registration', 'var') && (isequal(registration, 'noRegistration'))
+else
+    error("Registration option should equal 'registration' or 'noRegistration'.");
+end
 %% Return reconstruction
-% Transpose the image to align orientation with FBP:
-recon = Reconstruction('TV', alpha, maxK, reshape(xk_UPN, dims)');
+% Return the reconstruction, renormalized to [0,1]:
+recon = Reconstruction('TV', alpha, maxK, im2double(recon), gxk_UPN, hxk_UPN);
