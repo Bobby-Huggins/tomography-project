@@ -1,13 +1,16 @@
 function [recon] = totalVariation(...
-                        numProjections, binning, dataset, alpha, maxK)
+                        numProjections, subsampling, factor, dataset, ...
+                        alpha, maxK)
 %% totalVariation - Compute an approximation of the minimum total variation solution.
 %
 % INPUTS:
 % numProjections :: int
 %   The number of evenly spaced projections in the measurement data. Must
 %   divide 360.
-% binning :: int
-%   The binning factor.
+%   subsampling :: string
+%       Either 'subsampling' or 'binning'.
+%   factor :: int
+%       A scaling factor for the subsampling/binning.
 % dataset :: string
 %   The comparison dataset: either 'low dose' or 'high dose'.
 % alpha :: double
@@ -19,15 +22,15 @@ function [recon] = totalVariation(...
 % recon :: Reconstruction (see class file in /utility).
 %   A class containing the reconstructed image and associated data.
 
-xDim = ceil(2240/binning);
-yDim = ceil(2240/binning);
+xDim = ceil(2240/factor);
+yDim = ceil(2240/factor);
 dims   = [xDim,yDim];
 assert(mod(360, numProjections) == 0, 'Number of angles does not evenly divide 360 degrees.');
 angleInterval       = 360/numProjections;
 I0x1                = 1;
-I0x2                = ceil(256/binning);
+I0x2                = ceil(256/factor);
 I0y1                = 1;
-I0y2                = ceil(256/binning);
+I0y2                = ceil(256/factor);
 angles              = (angleInterval : angleInterval : 360);
 switch dataset
     case 'low dose'
@@ -40,11 +43,11 @@ end
     
 sinogram            = createSinogram(filePrefix, numProjections, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
-                                      binning);
+                                      subsampling, factor);
 %% Construct tomography system matrix A
 
 % Define physical parameters of the scan
-pixelSize               = 0.050*binning;
+pixelSize               = 0.050*factor;
 distanceSourceDetector  = 553.74;
 distanceSourceOrigin    = 110.66 + 100;
 distanceOriginDetector  = distanceSourceDetector - distanceSourceOrigin;
@@ -129,7 +132,8 @@ b = sinogram(:);
 % opt_ref.verbose  = 1;
 
 %% Solve: Compute TV minimizer
-
+disp(['Starting Iterative TV reconstruction with max iterations ',...
+    num2str(maxK), '...']);
 % % Reference solution
 % [x_ref fxk_ref hxk_ref gxk_ref fxkl_ref info_ref] = ...
 %     tvreg_upn(A,b,alpha,tau,dims,constraint,opt_ref);
@@ -170,4 +174,5 @@ tupn = toc
 % title('Convergence')
 
 %% Return reconstruction
-recon = Reconstruction('TV', alpha, maxK, reshape(xk_UPN, dims));
+% Transpose the image to align orientation with FBP:
+recon = Reconstruction('TV', alpha, maxK, reshape(xk_UPN, dims)');

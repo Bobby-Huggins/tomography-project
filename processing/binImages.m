@@ -15,6 +15,7 @@ corCorrection = -4;
 basePath = pwd;
 images = dir(fullfile(basePath, '/data/input/**/corrected/', ...
     strcat(filePrefix, '*.tif')));
+
 for ii = 1:length(images)
     image = im2double(imread(fullfile(images(ii).folder, images(ii).name)));
     image = circshift(image, corCorrection, 2);

@@ -1,5 +1,5 @@
 function recon = filteredBP(...
-    numProjections, binning, dataset)
+    numProjections, subsampling, factor, dataset)
 % FBP Reconstruction
 %
 % Inverse Problems Project Work course 2021
@@ -8,14 +8,14 @@ function recon = filteredBP(...
 % Keijo Korhonen, Ville Suokas, and Bobby Huggins
 
 %% Create sinogram
-xDim = ceil(2240/binning);
-yDim = ceil(2240/binning);
+xDim = ceil(2240/factor);
+yDim = ceil(2240/factor);
 assert(mod(360, numProjections) == 0, 'Number of angles does not evenly divide 360 degrees.');
 angleInterval       = 360/numProjections;
 I0x1                = 1;
-I0x2                = ceil(256/binning);
+I0x2                = ceil(256/factor);
 I0y1                = 1;
-I0y2                = ceil(256/binning);
+I0y2                = ceil(256/factor);
 angles              = (angleInterval : angleInterval : 360);
 switch dataset
     case 'low dose'
@@ -28,10 +28,10 @@ end
     
 sinogram           = createSinogram(filePrefix, numProjections, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
-                                      binning);                              
+                                      subsampling, factor);                              
 
 % Define physical parameters of the scan
-pixelSize               = 0.050*binning;
+pixelSize               = 0.050*factor;
 distanceSourceDetector  = 553.74;
 distanceSourceOrigin    = 110.66 + 100;
 distanceOriginDetector  = distanceSourceDetector - distanceSourceOrigin;
