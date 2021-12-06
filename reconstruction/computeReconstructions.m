@@ -6,7 +6,7 @@ clc
 % Set all parameters, and record them for reference:
 
 alphas = 2.^linspace(-14, 9, 24);
-factor = 8;
+factor = 4;
 maxK = 1000;
 numProjectionsSparse = 18;
 numProjectionsDense = 180;
@@ -46,12 +46,12 @@ for aa = 1:length(alphas)
     tvDense = totalVariation(numProjectionsDense, 'subsampling', factor, ...
                                 'low dose', alpha, maxK);
     
-    results.sparse.mse = immse(tvSparse.Image, reference.Image);
+    results.sparse.mse(aa) = immse(tvSparse.Image, reference.Image);
     results.sparse.ssim(aa) = ssim(tvSparse.Image, reference.Image);
     results.sparse.lCurve(aa, 1) = tvSparse.DataFidelity;
     results.sparse.lCurve(aa, 2) = tvSparse.GradLxNorm;
     
-    results.dense.mse = immse(tvDense.Image, reference.Image);
+    results.dense.mse(aa) = immse(tvDense.Image, reference.Image);
     results.dense.ssim(aa) = ssim(tvDense.Image, reference.Image);
     results.dense.lCurve(aa, 1) = tvDense.DataFidelity;
     results.dense.lCurve(aa, 2) = tvDense.GradLxNorm;
@@ -119,19 +119,15 @@ ylabel('SSIM');
 
 hold on;
 semilogx(results.alphas, results.sparse.ssim);
-title('SSIM for Sparse Case');
-xlabel('Alpha');
-ylabel('SSIM');
+legend('Dense Case', 'Sparse Case');
 
 figure;
 
 semilogx(results.alphas, results.dense.mse);
-title('MSE for Dense Case');
+title('MSE');
 xlabel('Alpha');
 ylabel('MSE');
 
 hold on;
 semilogx(results.alphas, results.sparse.mse);
-title('MSE for Sparse Case');
-xlabel('Alpha');
-ylabel('MSE');
+legend('Dense Case', 'Sparse Case');
