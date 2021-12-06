@@ -121,7 +121,7 @@ opt.epsb_rel = 1e-6;
 opt.k_max    = maxK;
 opt.qs       = 1;
 opt.K        = 2;
-opt.verbose  = 1;
+opt.verbose  = 0;
 opt.beta     = 0.95;
 
 b = sinogram(:);
@@ -133,7 +133,8 @@ b = sinogram(:);
 
 %% Solve: Compute TV minimizer
 disp(['Starting Iterative TV reconstruction with max iterations ',...
-    num2str(maxK), '...']);
+    num2str(maxK), ' for size ', num2str(xDim), ' by ', num2str(yDim), ...
+    ' with ' num2str(numProjections), ' projections...']);
 % % Reference solution
 % [x_ref fxk_ref hxk_ref gxk_ref fxkl_ref info_ref] = ...
 %     tvreg_upn(A,b,alpha,tau,dims,constraint,opt_ref);

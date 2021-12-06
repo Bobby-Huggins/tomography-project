@@ -45,11 +45,12 @@ I               = im2double(imread([fullPrefix, '001.tif']));
 
 % Initialize empty sinogram
 sinogram = zeros(nProj, cols);
+disp(['Creating sinogram of size ', num2str(nProj), ' by ', num2str(cols)]);
 
 % Loop over all projections and fill in sinogram
 for iii = 1 : nProj
     aaa = round(iii*angleInterval);
-    disp(['Processing angle ' num2str(iii) '/' num2str(nProj) '.']);
+    %disp(['Processing angle ' num2str(iii) '/' num2str(nProj) '.']);
     
     % Create full filename
     filename = [fullPrefix sprintf('%.03d', aaa) '.tif'];

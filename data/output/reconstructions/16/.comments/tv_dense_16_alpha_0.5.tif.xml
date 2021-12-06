@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<comment version="3.0">
+  <caption/>
+  <note>Dataset=dense, Method=TV, Size=140x140, Alpha=5.000000e-01, maxK=1000, Data Fidelity=1.235437e+02, Norm of Gradient=3.204559e+01</note>
+  <place/>
+  <categories/>
+</comment>
