@@ -49,7 +49,7 @@ sinogram            = createSinogram(filePrefix, numProjections, angleInterval, 
 % Define physical parameters of the scan
 pixelSize               = 0.050*factor;
 distanceSourceDetector  = 553.74;
-distanceSourceOrigin    = 110.66 + 100;
+distanceSourceOrigin    = 110.66 + 300;
 distanceOriginDetector  = distanceSourceDetector - distanceSourceOrigin;
 geometricMagnification  = distanceSourceDetector / distanceSourceOrigin;
 effectivePixelSize      = pixelSize / geometricMagnification;

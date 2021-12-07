@@ -41,7 +41,7 @@ I0y2                = ceil(256/binning);
 angles              = (angleInterval : angleInterval : 360);
 sinogram            = createSinogram(filePrefix, numProjections, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
-                                      binning); 
+                                      'binning', binning); 
 %% Construct tomography system matrix A and make spy plot
 
 % Define reconstruction size

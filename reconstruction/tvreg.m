@@ -18,7 +18,7 @@ clear
 close all
 clc
 %% Set parameters
-binning = 8;
+binning = 16;
 xDim = ceil(2240/binning);
 yDim = ceil(2240/binning);
 numProjections = 180; % Number of projections to reconstruct from
@@ -41,7 +41,7 @@ I0y2                = ceil(256/binning);
 angles              = (angleInterval : angleInterval : 360);
 sinogram            = createSinogram(filePrefix, numProjections, angleInterval, ...
                                       I0x1, I0x2, I0y1, I0y2, ...
-                                      binning); 
+                                      'binning', binning); 
 %% Construct tomography system matrix A and make spy plot
 
 % Define reconstruction size
@@ -101,8 +101,8 @@ projectorObject = astra_create_projector('strip_fanflat', ...
 projectionMatrix = astra_mex_projector('matrix', projectorObject);
 
 % Obtain projection matrix as a MATLAB sparse matrix
-A = astra_mex_matrix('get', projectionMatrix);
-%A = opTomo('strip_fanflat', projectionGeometry, volumeGeometry);
+%A = astra_mex_matrix('get', projectionMatrix);
+A = opTomo('strip_fanflat', projectionGeometry, volumeGeometry);
 
 fprintf('done.\n');
 
