@@ -11,7 +11,7 @@ clc
 % image. Otherwise they apply the transformation and return a corrected
 % image in the Reconstruction.
 %%
-factor = 1;
+factor = 4;
 fbpLowNoise = filteredBP(360, 'binning', factor, 'high dose', 'noRegistration');
 fbpHighNoise = filteredBP(360, 'binning', factor, 'low dose', 'noRegistration');
 %%
